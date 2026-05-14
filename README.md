@@ -11,6 +11,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | v3.3.2 | [`v3.3.2`](https://github.com/chainguard-actions/gradle-build-action/tree/v3.3.2) | — |
 | v3.4.0 | [`v3.4.0`](https://github.com/chainguard-actions/gradle-build-action/tree/v3.4.0) | — |
 | v3.4.1 | [`v3.4.1`](https://github.com/chainguard-actions/gradle-build-action/tree/v3.4.1) | — |
+| v3.5.0 | [`v3.5.0`](https://github.com/chainguard-actions/gradle-build-action/tree/v3.5.0) | — |
 
 ## Privacy
 
