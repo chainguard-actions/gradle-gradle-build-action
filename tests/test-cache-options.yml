@@ -1,0 +1,24 @@
+name: Test cache options
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          gradle-version: '8.7'
+          cache-disabled: 'false'
+          cache-read-only: 'true'
+          cache-write-only: 'false'
+          cache-overwrite-existing: 'false'
+          cache-encryption-key: 'dGVzdGtleXRlc3RrZXl0ZXN0a2V5dGVzdA=='
+          gradle-home-cache-excludes: |
+            caches/build-cache-*
+          add-job-summary: 'never'
+      - name: Assert action completed successfully
+        run: |
+          echo "Action completed with cache options including encryption key and excludes"
+          echo "PASS"

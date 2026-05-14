@@ -1,0 +1,29 @@
+name: Test basic usage with gradle-version
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          gradle-version: '8.7'
+          cache-disabled: 'true'
+          add-job-summary: 'never'
+      - name: Assert gradle-version output
+        env:
+          GRADLE_VERSION: ${{ steps.action.outputs.gradle-version }}
+        run: |
+          echo "gradle-version output: $GRADLE_VERSION"
+          if [ -z "$GRADLE_VERSION" ]; then
+            echo "FAIL: expected gradle-version output to be non-empty"
+            exit 1
+          fi
+          echo "PASS: gradle-version=$GRADLE_VERSION"
+      - name: Assert gradle is on PATH
+        run: |
+          which gradle || { echo "FAIL: gradle not found on PATH"; exit 1; }
+          gradle --version
+          echo "PASS"

@@ -1,0 +1,35 @@
+name: Test deprecated inputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Create minimal Gradle project
+        run: |
+          mkdir -p /tmp/gradle-project
+          cat > /tmp/gradle-project/build.gradle << 'EOF'
+          task hello {
+            doLast {
+              println 'Hello from Gradle!'
+            }
+          }
+          EOF
+          cat > /tmp/gradle-project/settings.gradle << 'EOF'
+          rootProject.name = 'test-project'
+          EOF
+      - id: action
+        uses: .
+        with:
+          gradle-version: '8.7'
+          cache-disabled: 'true'
+          add-job-summary: 'never'
+          arguments: 'help'
+          build-root-directory: '/tmp/gradle-project'
+          build-scan-terms-of-service-url: 'https://gradle.com/terms-of-service'
+          build-scan-terms-of-service-agree: 'yes'
+      - name: Assert action completed successfully
+        run: |
+          echo "Action completed with deprecated inputs"
+          echo "PASS"
