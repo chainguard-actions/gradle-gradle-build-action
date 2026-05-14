@@ -1,0 +1,41 @@
+name: Test basic usage with gradle-version
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REF: refs/heads/main
+      GITHUB_EVENT_NAME: push
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          gradle-version: "8.8"
+          cache-disabled: "true"
+          cache-read-only: "false"
+          cache-write-only: "false"
+          cache-overwrite-existing: "false"
+          gradle-home-cache-includes: |
+            caches
+            notifications
+          gradle-home-cache-excludes: "caches/modules-2/files-2.1"
+          gradle-home-cache-cleanup: "false"
+          gradle-home-cache-strict-match: "false"
+          add-job-summary: "always"
+          add-job-summary-as-pr-comment: "never"
+          dependency-graph: "disabled"
+          dependency-graph-continue-on-failure: "true"
+          validate-wrappers: "false"
+          generate-job-summary: "true"
+      - name: Assert gradle-version output is set
+        env:
+          ACTUAL: ${{ steps.action.outputs.gradle-version }}
+        run: |
+          echo "actual gradle-version: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: expected gradle-version output to be non-empty"
+            exit 1
+          fi
+          echo "PASS: gradle-version=$ACTUAL"
