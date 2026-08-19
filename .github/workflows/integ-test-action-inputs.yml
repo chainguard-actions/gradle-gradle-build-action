@@ -1,0 +1,38 @@
+name: Test action inputs
+
+on:
+  workflow_call:
+    inputs:
+      cache-key-prefix:
+        type: string
+      runner-os:
+        type: string
+        default: '["ubuntu-latest", "windows-latest", "macos-latest"]'
+
+permissions:
+  contents: read
+
+env:
+  GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: action-inputs-${{ inputs.cache-key-prefix }}
+  GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: true
+
+jobs:
+  action-inputs:
+    strategy:
+      matrix:
+        os: ${{fromJSON(inputs.runner-os)}}
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout sources
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+    - name: Invoke with multi-line arguments
+      uses: ./
+      with:
+        build-root-directory: .github/workflow-samples/groovy-dsl
+        arguments: |
+            --configuration-cache
+            --build-cache
+            -DsystemProperty=FOO
+            -PgradleProperty=BAR
+            test
+            jar

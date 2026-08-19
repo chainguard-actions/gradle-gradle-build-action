@@ -1,4 +1,4 @@
-name: Test basic Gradle setup (cache disabled)
+name: Test specific Gradle version download
 on:
   workflow_dispatch:
 jobs:
@@ -14,16 +14,20 @@ jobs:
           gradle-version: '8.7'
           cache-disabled: 'true'
 
-      - name: Assert action ran and gradle-version output is set or failed gracefully
+      - name: Assert gradle-version output matches requested version or failed gracefully
         env:
           GRADLE_VERSION: ${{ steps.action.outputs.gradle-version }}
           OUTCOME: ${{ steps.action.outcome }}
         run: |
           echo "outcome: $OUTCOME"
-          echo "gradle-version: $GRADLE_VERSION"
+          echo "gradle-version output: $GRADLE_VERSION"
           if [ "$OUTCOME" = "success" ]; then
             if [ -z "$GRADLE_VERSION" ]; then
               echo "FAIL: action succeeded but gradle-version output is empty"
+              exit 1
+            fi
+            if ! echo "$GRADLE_VERSION" | grep -q "^8\.7"; then
+              echo "FAIL: expected gradle-version starting with '8.7', got '$GRADLE_VERSION'"
               exit 1
             fi
             echo "PASS: gradle-version is '$GRADLE_VERSION'"
@@ -34,7 +38,7 @@ jobs:
             exit 1
           fi
 
-      - name: Assert gradle is on PATH (if action succeeded)
+      - name: Assert correct Gradle version is on PATH (if action succeeded)
         env:
           OUTCOME: ${{ steps.action.outcome }}
         run: |
@@ -43,8 +47,13 @@ jobs:
               echo "FAIL: gradle not found on PATH after successful setup"
               exit 1
             fi
-            echo "PASS: gradle found at $(command -v gradle)"
-            gradle --version
+            VERSION_OUTPUT=$(gradle --version 2>&1)
+            echo "$VERSION_OUTPUT"
+            if ! echo "$VERSION_OUTPUT" | grep -q "8\.7"; then
+              echo "FAIL: expected Gradle 8.7 but got: $VERSION_OUTPUT"
+              exit 1
+            fi
+            echo "PASS: Gradle 8.7 is active"
           else
-            echo "SKIP: action did not succeed, skipping gradle PATH check"
+            echo "SKIP: action did not succeed, skipping Gradle version check"
           fi
