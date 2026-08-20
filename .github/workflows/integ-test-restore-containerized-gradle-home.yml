@@ -1,0 +1,54 @@
+name: Test restore custom Gradle Home
+
+on:
+  workflow_call:
+    inputs:
+      cache-key-prefix:
+        type: string
+
+permissions: {}
+
+env:
+  GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: restore-custom-gradle-home-${{ inputs.cache-key-prefix }}
+  GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: true
+
+jobs:
+  seed-build:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+    - name: Checkout sources
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+    - name: Setup Java
+      uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+      with:
+        java-version: 11
+        distribution: temurin
+    - name: Setup Gradle
+      uses: ./
+      with:
+        cache-read-only: false # For testing, allow writing cache entries on non-default branches
+    - name: Build using Gradle wrapper
+      working-directory: .github/workflow-samples/groovy-dsl
+      run: ./gradlew test
+
+  # Test that the gradle-user-home cache will cache dependencies, by running build with --offline
+  dependencies-cache:
+    needs: seed-build
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+    - name: Checkout sources
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+    - name: Setup Java
+      uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+      with:
+        java-version: 11
+        distribution: temurin
+    - name: Setup Gradle
+      uses: ./
+      with:
+        cache-read-only: true
+    - name: Execute Gradle build with --offline
+      working-directory: .github/workflow-samples/groovy-dsl
+      run: ./gradlew test --offline
