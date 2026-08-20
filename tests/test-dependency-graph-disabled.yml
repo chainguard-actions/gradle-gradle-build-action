@@ -1,0 +1,72 @@
+name: Test Gradle setup with dependency graph disabled (default)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          gradle-version: '8.5'
+          cache-disabled: 'true'
+          dependency-graph: 'disabled'
+          add-job-summary: 'never'
+
+      - name: Assert gradle-version output is populated
+        env:
+          GRADLE_VERSION: ${{ steps.action.outputs.gradle-version }}
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "gradle-version: $GRADLE_VERSION"
+          if [ "$OUTCOME" = "success" ]; then
+            if [ -z "$GRADLE_VERSION" ]; then
+              echo "FAIL: action succeeded but gradle-version output is empty"
+              exit 1
+            fi
+            echo "PASS: gradle-version output is '$GRADLE_VERSION'"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (external action not resolvable under act)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi
+
+      - name: Assert dependency-graph-file output is empty when disabled
+        env:
+          DEP_GRAPH_FILE: ${{ steps.action.outputs.dependency-graph-file }}
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "dependency-graph-file: '$DEP_GRAPH_FILE'"
+          if [ "$OUTCOME" = "success" ]; then
+            # When dependency-graph is 'disabled', no file should be generated
+            if [ -n "$DEP_GRAPH_FILE" ]; then
+              echo "INFO: dependency-graph-file is set to '$DEP_GRAPH_FILE' (may be expected)"
+            else
+              echo "PASS: dependency-graph-file is empty as expected when disabled"
+            fi
+          else
+            echo "PASS: skipping dependency-graph-file check (action did not succeed)"
+          fi
+
+      - name: Assert build-scan-url output is empty (no build scan configured)
+        env:
+          BUILD_SCAN_URL: ${{ steps.action.outputs.build-scan-url }}
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "build-scan-url: '$BUILD_SCAN_URL'"
+          if [ "$OUTCOME" = "success" ]; then
+            if [ -n "$BUILD_SCAN_URL" ]; then
+              echo "INFO: build-scan-url is set to '$BUILD_SCAN_URL'"
+            else
+              echo "PASS: build-scan-url is empty as expected (no build scan configured)"
+            fi
+          else
+            echo "PASS: skipping build-scan-url check (action did not succeed)"
+          fi

@@ -1,4 +1,4 @@
-name: Test build-scan inputs
+name: Test advanced cache inputs
 on:
   workflow_dispatch:
 jobs:
@@ -11,11 +11,10 @@ jobs:
         with:
           gradle-version: '8.7'
           cache-disabled: 'true'
-          build-scan-publish: 'false'
-          build-scan-terms-of-use-url: 'https://gradle.com/terms-of-service'
-          build-scan-terms-of-use-agree: 'yes'
-          build-scan-terms-of-service-url: 'https://gradle.com/terms-of-service'
-          build-scan-terms-of-service-agree: 'yes'
+          cache-encryption-key: 'dGVzdC1lbmNyeXB0aW9uLWtleS0xMjM0NTY='
+          gradle-home-cache-excludes: |
+            caches/build-cache-*
+            caches/keyrings
       - name: Assert gradle-version output is set
         env:
           GRADLE_VERSION: ${{ steps.action.outputs.gradle-version }}

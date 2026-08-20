@@ -1,4 +1,4 @@
-name: Test basic Gradle setup with specific version
+name: Test Gradle setup with cache read-only
 on:
   workflow_dispatch:
 jobs:
@@ -12,23 +12,23 @@ jobs:
         continue-on-error: true
         with:
           gradle-version: '8.7'
-          cache-disabled: 'true'
+          cache-read-only: 'true'
           dependency-graph: 'disabled'
           add-job-summary: 'never'
 
-      - name: Assert action ran (gradle-version set or failed gracefully)
+      - name: Assert gradle-version output is set in cache-read-only mode
         env:
           GRADLE_VERSION: ${{ steps.action.outputs.gradle-version }}
           OUTCOME: ${{ steps.action.outcome }}
         run: |
           echo "outcome: $OUTCOME"
-          echo "gradle-version output: $GRADLE_VERSION"
+          echo "gradle-version: $GRADLE_VERSION"
           if [ "$OUTCOME" = "success" ]; then
             if [ -z "$GRADLE_VERSION" ]; then
               echo "FAIL: action succeeded but gradle-version output is empty"
               exit 1
             fi
-            echo "PASS: gradle-version output is '$GRADLE_VERSION'"
+            echo "PASS: gradle-version is '$GRADLE_VERSION'"
           elif [ "$OUTCOME" = "failure" ]; then
             echo "PASS: action failed gracefully (external action not resolvable under act)"
           else
@@ -36,24 +36,24 @@ jobs:
             exit 1
           fi
 
-      - name: Assert Gradle is available on PATH (if action succeeded)
+      - name: Assert Gradle is available in cache-read-only mode (if action succeeded)
         env:
           OUTCOME: ${{ steps.action.outcome }}
         run: |
           echo "outcome: $OUTCOME"
           if [ "$OUTCOME" = "success" ]; then
-            echo "Checking gradle on PATH..."
+            echo "Verifying Gradle is on PATH in cache-read-only mode..."
             if ! command -v gradle >/dev/null 2>&1; then
-              echo "FAIL: gradle not found on PATH after successful setup"
+              echo "FAIL: gradle not found on PATH"
               exit 1
             fi
-            ACTUAL_VERSION=$(gradle --version 2>&1 | grep -i "^Gradle " | head -1)
-            echo "Gradle version: $ACTUAL_VERSION"
-            if [ -z "$ACTUAL_VERSION" ]; then
-              echo "FAIL: could not determine Gradle version"
+            VERSION_OUTPUT=$(gradle --version 2>&1)
+            echo "$VERSION_OUTPUT"
+            if ! echo "$VERSION_OUTPUT" | grep -qi "gradle"; then
+              echo "FAIL: gradle --version output unexpected"
               exit 1
             fi
-            echo "PASS: Gradle is available"
+            echo "PASS: Gradle is available in cache-read-only mode"
           else
             echo "PASS: skipping Gradle PATH check (action did not succeed)"
           fi

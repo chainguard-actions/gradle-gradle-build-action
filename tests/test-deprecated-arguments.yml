@@ -1,4 +1,4 @@
-name: Test build-scan inputs
+name: Test deprecated arguments and build-root-directory inputs
 on:
   workflow_dispatch:
 jobs:
@@ -6,16 +6,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Create minimal Gradle project
+        run: |
+          mkdir -p /tmp/gradle-test-project
+          cat > /tmp/gradle-test-project/build.gradle <<'EOF'
+          task hello {
+            doLast {
+              println 'Hello from Gradle!'
+            }
+          }
+          EOF
+          cat > /tmp/gradle-test-project/settings.gradle <<'EOF'
+          rootProject.name = 'test-project'
+          EOF
       - id: action
         uses: .
         with:
           gradle-version: '8.7'
           cache-disabled: 'true'
-          build-scan-publish: 'false'
-          build-scan-terms-of-use-url: 'https://gradle.com/terms-of-service'
-          build-scan-terms-of-use-agree: 'yes'
-          build-scan-terms-of-service-url: 'https://gradle.com/terms-of-service'
-          build-scan-terms-of-service-agree: 'yes'
+          build-root-directory: '/tmp/gradle-test-project'
+          arguments: 'hello'
+          artifact-retention-days: '1'
       - name: Assert gradle-version output is set
         env:
           GRADLE_VERSION: ${{ steps.action.outputs.gradle-version }}
