@@ -8,7 +8,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
-| v3.3.2 | [`v3.3.2`](https://github.com/chainguard-actions/gradle-gradle-build-action/tree/v3.3.2) | — |
+| v3.3.2 | [`v3.3.2`](https://github.com/chainguard-actions/gradle-gradle-build-action/tree/v3.3.2) | [`4c39dd8`](https://github.com/gradle/gradle-build-action/commit/4c39dd82cd5e1ec7c6fa0173bb41b4b6bb3b86ff) |
 | v3.4.0 | [`v3.4.0`](https://github.com/chainguard-actions/gradle-gradle-build-action/tree/v3.4.0) | — |
 | v3.4.1 | [`v3.4.1`](https://github.com/chainguard-actions/gradle-gradle-build-action/tree/v3.4.1) | [`04b20c0`](https://github.com/gradle/gradle-build-action/commit/04b20c065cf1ab708c96e64a8811018d0a1fbc88) |
 | v3.4.2 | [`v3.4.2`](https://github.com/chainguard-actions/gradle-gradle-build-action/tree/v3.4.2) | [`66535aa`](https://github.com/gradle/gradle-build-action/commit/66535aaf56f831b35e3a8481c9c99b665b84dd45) |
