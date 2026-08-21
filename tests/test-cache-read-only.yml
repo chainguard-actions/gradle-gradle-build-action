@@ -1,4 +1,4 @@
-name: Test basic usage - setup Gradle with cache disabled
+name: Test cache read-only mode
 on:
   workflow_dispatch:
 jobs:
@@ -11,10 +11,11 @@ jobs:
         uses: .
         with:
           gradle-version: '8.7'
-          cache-disabled: 'true'
+          cache-read-only: 'true'
+          cache-disabled: 'false'
         continue-on-error: true
 
-      - name: Assert action ran and gradle-version output is set
+      - name: Assert action ran in cache-read-only mode
         env:
           GRADLE_VERSION: ${{ steps.action.outputs.gradle-version }}
           OUTCOME: ${{ steps.action.outcome }}
@@ -27,7 +28,7 @@ jobs:
               exit 1
             fi
             if echo "$GRADLE_VERSION" | grep -q "8.7"; then
-              echo "PASS: gradle-version '$GRADLE_VERSION' contains expected version 8.7"
+              echo "PASS: gradle-version '$GRADLE_VERSION' contains expected version 8.7 in cache-read-only mode"
             else
               echo "FAIL: expected gradle-version to contain '8.7', got '$GRADLE_VERSION'"
               exit 1

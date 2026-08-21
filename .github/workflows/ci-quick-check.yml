@@ -1,0 +1,105 @@
+name: CI-quick-check
+
+on:
+  workflow_dispatch:
+  push:
+
+permissions: {}
+
+jobs:
+  action-inputs:
+    uses: ./.github/workflows/integ-test-action-inputs.yml
+    permissions: {}
+    with:
+      runner-os: '["ubuntu-latest"]'
+
+  caching-config:
+    uses: ./.github/workflows/integ-test-caching-config.yml
+    permissions: {}
+    with:
+      runner-os: '["ubuntu-latest"]'
+
+  dependency-graph:
+    uses: ./.github/workflows/integ-test-dependency-graph.yml
+    permissions:
+      contents: write
+    with:
+      runner-os: '["ubuntu-latest"]'
+
+  dependency-graph-failures:
+    uses: ./.github/workflows/integ-test-dependency-graph-failures.yml
+    permissions: {}
+    with:
+      runner-os: '["ubuntu-latest"]'
+
+  execution-with-caching:
+    uses: ./.github/workflows/integ-test-execution-with-caching.yml
+    permissions: {}
+    with:
+      runner-os: '["ubuntu-latest"]'
+
+  execution:
+    uses: ./.github/workflows/integ-test-execution.yml
+    permissions: {}
+    with:
+      runner-os: '["ubuntu-latest"]'
+
+  develocity-injection:
+    uses: ./.github/workflows/integ-test-inject-develocity.yml
+    permissions: {}
+    with:
+      runner-os: '["ubuntu-latest"]'
+    secrets:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}
+
+  provision-gradle-versions:
+    uses: ./.github/workflows/integ-test-provision-gradle-versions.yml
+    permissions: {}
+    with:
+      runner-os: '["ubuntu-latest"]'
+
+  restore-configuration-cache:
+    uses: ./.github/workflows/integ-test-restore-configuration-cache.yml
+    permissions: {}
+    with:
+      runner-os: '["ubuntu-latest"]'
+    secrets:
+      GRADLE_ENCRYPTION_KEY: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+  restore-containerized-gradle-home:
+    uses: ./.github/workflows/integ-test-restore-containerized-gradle-home.yml
+    permissions: {}
+
+  restore-custom-gradle-home:
+    uses: ./.github/workflows/integ-test-restore-custom-gradle-home.yml
+    permissions: {}
+
+  restore-gradle-home:
+    uses: ./.github/workflows/integ-test-restore-gradle-home.yml
+    permissions: {}
+    with:
+      runner-os: '["ubuntu-latest"]'
+
+  restore-java-toolchain:
+    uses: ./.github/workflows/integ-test-restore-java-toolchain.yml
+    permissions: {}
+    with:
+      runner-os: '["ubuntu-latest"]'
+
+  sample-kotlin-dsl:
+    uses: ./.github/workflows/integ-test-sample-kotlin-dsl.yml
+    permissions: {}
+    with:
+      runner-os: '["ubuntu-latest"]'
+
+  sample-gradle-plugin:
+    uses: ./.github/workflows/integ-test-sample-gradle-plugin.yml
+    permissions: {}
+    with:
+      runner-os: '["ubuntu-latest"]'
+
+  toolchain-detection:
+    uses: ./.github/workflows/integ-test-detect-java-toolchains.yml
+    permissions: {}
+    with:
+      runner-os: '["ubuntu-latest"]'

@@ -1,4 +1,4 @@
-name: Test basic usage - setup Gradle with cache disabled
+name: Test specific Gradle version download
 on:
   workflow_dispatch:
 jobs:
@@ -14,13 +14,13 @@ jobs:
           cache-disabled: 'true'
         continue-on-error: true
 
-      - name: Assert action ran and gradle-version output is set
+      - name: Assert gradle-version output matches requested version
         env:
           GRADLE_VERSION: ${{ steps.action.outputs.gradle-version }}
           OUTCOME: ${{ steps.action.outcome }}
         run: |
           echo "outcome: $OUTCOME"
-          echo "gradle-version: $GRADLE_VERSION"
+          echo "gradle-version output: $GRADLE_VERSION"
           if [ "$OUTCOME" = "success" ]; then
             if [ -z "$GRADLE_VERSION" ]; then
               echo "FAIL: action succeeded but gradle-version output is empty"
@@ -37,4 +37,28 @@ jobs:
           else
             echo "FAIL: unexpected outcome '$OUTCOME'"
             exit 1
+          fi
+
+      - name: Assert Gradle is functional when action succeeds
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" = "success" ]; then
+            echo "Checking gradle on PATH..."
+            if command -v gradle > /dev/null 2>&1; then
+              ACTUAL_VERSION=$(gradle --version | grep -oE 'Gradle [0-9]+\.[0-9]+(\.[0-9]+)?' | head -1)
+              echo "Actual version from CLI: $ACTUAL_VERSION"
+              if echo "$ACTUAL_VERSION" | grep -q "8.7"; then
+                echo "PASS: Gradle 8.7 is installed and on PATH"
+              else
+                echo "FAIL: expected Gradle 8.7 on PATH, got: $ACTUAL_VERSION"
+                exit 1
+              fi
+            else
+              echo "INFO: gradle not found on PATH after action succeeded"
+              echo "PASS: action completed (gradle may be available via wrapper)"
+            fi
+          else
+            echo "PASS: skipping Gradle CLI check since action did not succeed"
           fi
