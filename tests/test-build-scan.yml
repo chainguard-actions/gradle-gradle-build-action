@@ -1,4 +1,4 @@
-name: Test build-scan inputs
+name: Test build scan inputs
 on:
   workflow_dispatch:
 jobs:

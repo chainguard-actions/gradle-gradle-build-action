@@ -10,12 +10,11 @@ jobs:
         uses: .
         with:
           cache-disabled: 'true'
-          artifact-retention-days: '5'
+          artifact-retention-days: '7'
           build-root-directory: '.'
           arguments: '--version'
-          gradle-version: '8.7'
         continue-on-error: true
-      - name: Assert action ran (deprecated args or succeeded)
+      - name: Assert action ran (deprecated inputs accepted or failed gracefully)
         env:
           OUTCOME: ${{ steps.action.outcome }}
           GRADLE_VERSION: ${{ steps.action.outputs.gradle-version }}
@@ -29,7 +28,7 @@ jobs:
             fi
             echo "PASS: action succeeded with gradle-version=$GRADLE_VERSION"
           elif [ "$OUTCOME" = "failure" ]; then
-            echo "PASS: action failed gracefully (deprecated inputs may not be supported)"
+            echo "PASS: action failed gracefully (deprecated inputs may not be supported in this context)"
           else
             echo "FAIL: unexpected outcome '$OUTCOME'"
             exit 1

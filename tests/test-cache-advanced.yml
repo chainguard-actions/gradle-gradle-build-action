@@ -6,16 +6,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Generate cache encryption key
-        id: gen-key
-        run: |
-          KEY=$(openssl rand -base64 16)
-          echo "key=$KEY" >> "$GITHUB_OUTPUT"
       - id: action
         uses: .
         with:
           cache-disabled: 'true'
-          cache-encryption-key: ${{ steps.gen-key.outputs.key }}
+          cache-encryption-key: 'dGVzdGtleWZvcmVuY3J5cHRpb24xMjM='
           gradle-home-cache-excludes: |
             caches/build-cache-*
             caches/keyrings
