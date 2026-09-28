@@ -1,4 +1,4 @@
-name: Test deprecated arguments and build-root-directory inputs
+name: Test Develocity configuration inputs
 on:
   workflow_dispatch:
 jobs:
@@ -6,24 +6,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Create minimal Gradle wrapper project
-        run: |
-          mkdir -p "$GITHUB_WORKSPACE/test-project"
-          cat > "$GITHUB_WORKSPACE/test-project/settings.gradle" << 'EOF'
-          rootProject.name = 'test-project'
-          EOF
-          cat > "$GITHUB_WORKSPACE/test-project/build.gradle" << 'EOF'
-          plugins {
-              id 'base'
-          }
-          EOF
       - id: action
         uses: .
         with:
-          gradle-version: '8.5'
           cache-disabled: 'true'
-          arguments: 'help'
-          build-root-directory: 'test-project'
+          develocity-injection-enabled: 'false'
+          develocity-url: 'https://develocity.example.com'
+          develocity-allow-untrusted-server: 'false'
+          develocity-capture-file-fingerprints: 'false'
+          develocity-enforce-url: 'false'
+          develocity-plugin-version: '3.17'
+          develocity-ccud-plugin-version: '2.0'
+          develocity-token-expiry: '2'
+          develocity-access-key: ''
           add-job-summary: 'never'
       - name: Assert gradle-version output is set
         env:
