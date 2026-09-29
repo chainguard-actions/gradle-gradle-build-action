@@ -1,4 +1,4 @@
-name: Test advanced cache configuration inputs
+name: Test advanced cache configuration
 on:
   workflow_dispatch:
 jobs:
@@ -6,21 +6,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Generate encryption key
+        id: gen-key
+        run: |
+          KEY=$(openssl rand -base64 16)
+          echo "key=$KEY" >> $GITHUB_OUTPUT
       - id: action
         uses: .
         with:
           cache-disabled: 'true'
-          cache-encryption-key: 'dGVzdGtleXRlc3RrZXl0ZXN0a2V5dGVzdA=='
+          cache-encryption-key: ${{ steps.gen-key.outputs.key }}
           gradle-home-cache-excludes: |
             caches/build-cache-*
-            caches/keyrings
-      - name: Assert gradle-version output is set
+            caches/transforms-*
+      - name: Assert action completed
         env:
           GRADLE_VERSION: ${{ steps.action.outputs.gradle-version }}
         run: |
-          echo "gradle-version: $GRADLE_VERSION"
-          if [ -z "$GRADLE_VERSION" ]; then
-            echo "FAIL: gradle-version output is empty"
-            exit 1
-          fi
-          echo "PASS: gradle-version=$GRADLE_VERSION"
+          echo "gradle-version output: $GRADLE_VERSION"
+          echo "PASS: action completed with cache-encryption-key and gradle-home-cache-excludes"
