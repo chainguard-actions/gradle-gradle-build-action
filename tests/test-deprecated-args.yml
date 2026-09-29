@@ -1,4 +1,4 @@
-name: Test deprecated arguments and artifact-retention-days inputs
+name: Test deprecated arguments inputs
 on:
   workflow_dispatch:
 jobs:
@@ -8,32 +8,24 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Create minimal Gradle wrapper project
         run: |
-          mkdir -p "$GITHUB_WORKSPACE/test-project/gradle/wrapper"
-          cat > "$GITHUB_WORKSPACE/test-project/settings.gradle" <<'EOF'
+          mkdir -p "$GITHUB_WORKSPACE/gradle-test-project"
+          cd "$GITHUB_WORKSPACE/gradle-test-project"
+          cat > settings.gradle << 'EOF'
           rootProject.name = 'test-project'
           EOF
-          cat > "$GITHUB_WORKSPACE/test-project/build.gradle" <<'EOF'
+          cat > build.gradle << 'EOF'
           plugins {
               id 'base'
           }
-          EOF
-          # Use a known Gradle wrapper jar checksum (Gradle 8.7)
-          cat > "$GITHUB_WORKSPACE/test-project/gradle/wrapper/gradle-wrapper.properties" <<'EOF'
-          distributionBase=GRADLE_USER_HOME
-          distributionPath=wrapper/dists
-          distributionUrl=https\://services.gradle.org/distributions/gradle-8.7-bin.zip
-          networkTimeout=10000
-          validateDistributionUrl=true
-          zipStoreBase=GRADLE_USER_HOME
-          zipStorePath=wrapper/dists
           EOF
       - id: action
         uses: .
         with:
           cache-disabled: 'true'
-          artifact-retention-days: '5'
-          build-root-directory: 'test-project'
+          gradle-version: 'current'
+          build-root-directory: 'gradle-test-project'
           arguments: 'help'
+          artifact-retention-days: '1'
       - name: Assert gradle-version output is set
         env:
           GRADLE_VERSION: ${{ steps.action.outputs.gradle-version }}
@@ -43,4 +35,4 @@ jobs:
             echo "FAIL: gradle-version output is empty"
             exit 1
           fi
-          echo "PASS"
+          echo "PASS: gradle-version=$GRADLE_VERSION"

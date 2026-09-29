@@ -28,4 +28,4 @@ jobs:
             echo "FAIL: gradle-version output is empty"
             exit 1
           fi
-          echo "PASS"
+          echo "PASS: gradle-version=$GRADLE_VERSION"
