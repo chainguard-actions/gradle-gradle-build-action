@@ -16,11 +16,11 @@ Action **gradle--gradle-build-action/v3.4.1** was hardened automatically. 1 find
 
 ### unpinned-uses (severity: high)
 
-The composite action uses `gradle/actions/setup-gradle@v3.4.1`, which is pinned to a mutable tag (`v3.4.1`) rather than an immutable 40-character commit SHA. If the tag is moved (intentionally or via a supply-chain attack), the action will silently execute different code. It should be pinned to a full SHA, e.g. `gradle/actions/setup-gradle@<40-char-sha> # v3.4.1`.
+The composite action step uses a mutable version tag reference instead of a pinned full-length commit SHA. `uses: gradle/actions/setup-gradle@v3.4.1` should be replaced with a full 40-character hex commit SHA (e.g. `uses: gradle/actions/setup-gradle@<40-char-sha> # v3.4.1`) to prevent supply-chain attacks where the tag is silently moved to a different, potentially malicious commit.
 
 Locations:
 
-- `action.yml:265`
+- `action.yml:248`
 
 ## Iteration Notes
 
@@ -30,5 +30,5 @@ Locations:
 
 **Notes:**
 
-Pinned `gradle/actions/setup-gradle@v3.4.1` to the immutable commit SHA `31ae3562f68c96d481c31bc1a8a55cc1be162f83` in hardened/action/action.yml. The original tag is preserved as an inline comment (`# v3.4.1`) for readability.
+Replaced `uses: gradle/actions/setup-gradle@v3.4.1` with `uses: gradle/actions/setup-gradle@31ae3562f68c96d481c31bc1a8a55cc1be162f83 # v3.4.1` in hardened/action/action.yml line 248. The SHA was resolved via lookup_action_sha for the v3.4.1 tag.
 
