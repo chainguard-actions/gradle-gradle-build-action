@@ -10,7 +10,7 @@ jobs:
         uses: .
         with:
           cache-disabled: 'true'
-          cache-encryption-key: 'dGVzdGtleWZvcmVuY3J5cHRpb24xMjM='
+          cache-encryption-key: ''
           gradle-home-cache-excludes: |
             caches/build-cache-*
             caches/keyrings
@@ -23,4 +23,4 @@ jobs:
             echo "FAIL: gradle-version output is empty"
             exit 1
           fi
-          echo "PASS: gradle-version=$GRADLE_VERSION"
+          echo "PASS"
