@@ -6,34 +6,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Create minimal Gradle project
+      - name: Create minimal Gradle wrapper project
         run: |
-          mkdir -p "$GITHUB_WORKSPACE/hardened/tests/fixtures/gradle-project"
-          cat > "$GITHUB_WORKSPACE/hardened/tests/fixtures/gradle-project/settings.gradle" << 'EOF'
+          mkdir -p "$GITHUB_WORKSPACE/test-project/gradle/wrapper"
+          cat > "$GITHUB_WORKSPACE/test-project/settings.gradle" << 'EOF'
           rootProject.name = 'test-project'
           EOF
-          cat > "$GITHUB_WORKSPACE/hardened/tests/fixtures/gradle-project/build.gradle" << 'EOF'
+          cat > "$GITHUB_WORKSPACE/test-project/build.gradle" << 'EOF'
           plugins {
               id 'base'
           }
           EOF
       - id: action
         uses: .
-        continue-on-error: true
         with:
-          cache-disabled: 'true'
-          build-root-directory: hardened/tests/fixtures/gradle-project
-          arguments: 'help'
-      - name: Assert action ran with deprecated inputs
+          gradle-version: '8.7'
+          cache-disabled: true
+          add-job-summary: 'never'
+          build-root-directory: test-project
+          arguments: '--version'
+      - name: Assert gradle-version output is set
         env:
-          OUTCOME: ${{ steps.action.outcome }}
           GRADLE_VERSION: ${{ steps.action.outputs.gradle-version }}
         run: |
-          echo "outcome: $OUTCOME"
           echo "gradle-version: $GRADLE_VERSION"
-          if [ "$OUTCOME" = "success" ] || [ "$OUTCOME" = "failure" ]; then
-            echo "PASS: action ran with build-root-directory and arguments inputs"
-          else
-            echo "FAIL: unexpected outcome '$OUTCOME'"
+          if [ -z "$GRADLE_VERSION" ]; then
+            echo "FAIL: gradle-version output is empty"
             exit 1
           fi
+          echo "PASS: gradle-version is '$GRADLE_VERSION'"
