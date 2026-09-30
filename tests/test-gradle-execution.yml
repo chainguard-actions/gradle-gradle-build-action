@@ -1,4 +1,4 @@
-name: Test deprecated arguments and build-root-directory inputs
+name: Test gradle execution inputs
 on:
   workflow_dispatch:
 jobs:
@@ -6,13 +6,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Create minimal Gradle wrapper project
+      - name: Set up minimal Gradle project
         run: |
-          mkdir -p "$GITHUB_WORKSPACE/test-project"
-          cat > "$GITHUB_WORKSPACE/test-project/settings.gradle" << 'EOF'
+          mkdir -p "$GITHUB_WORKSPACE/gradle-test-project"
+          cat > "$GITHUB_WORKSPACE/gradle-test-project/settings.gradle" << 'EOF'
           rootProject.name = 'test-project'
           EOF
-          cat > "$GITHUB_WORKSPACE/test-project/build.gradle" << 'EOF'
+          cat > "$GITHUB_WORKSPACE/gradle-test-project/build.gradle" << 'EOF'
           plugins {
               id 'base'
           }
@@ -22,9 +22,9 @@ jobs:
         with:
           gradle-version: '8.5'
           cache-disabled: 'true'
+          build-root-directory: 'gradle-test-project'
           arguments: 'help'
-          build-root-directory: 'test-project'
-          add-job-summary: 'never'
+          artifact-retention-days: '1'
       - name: Assert gradle-version output is set
         env:
           GRADLE_VERSION: ${{ steps.action.outputs.gradle-version }}
@@ -34,4 +34,4 @@ jobs:
             echo "FAIL: gradle-version output is empty"
             exit 1
           fi
-          echo "PASS: gradle-version=$GRADLE_VERSION"
+          echo "PASS"
