@@ -197,7 +197,7 @@ runs:
           "https://actions.enforce.dev/actions/v1/record" >/dev/null 2>&1 || true
     - name: Setup Gradle
       id: setup-gradle
-      uses: chainguard-actions/gradle-actions/setup-gradle@881536417f43817c15552a80342733f7831ba1bf # v3.4.2
+      uses: chainguard-actions/gradle-actions/setup-gradle@f85dce98d9342c68f396af814b3fc322cf489cb9 # v3.4.2
       with:
         gradle-version: ${{ inputs.gradle-version }}
         cache-disabled: ${{ inputs.cache-disabled }}
